@@ -1,0 +1,70 @@
+Acts as Statemachine Plugin
+===================================
+
+This plugin is inspired by:
+http://elitists.textdriven.com/svn/plugins/acts_as_state_machine/trunk
+
+Allows definition of states and transition between states.
+Ideal for generating workflows.
+
+
+Usage Examples
+----------------
+
+class Order extends ActiveRecord
+{
+    var $acts_as = array('statemachine'=>array('initial'=>'openend',
+                                               'states'=>array('opened',
+                                                               'closed'=>array('enter'=>'sendEmail'),
+                                                               'returned')));
+                                                               
+   function close()
+   {
+       $this->transition('opened','closed');
+   }
+
+   function returnOrder()
+   {
+       $this->transition('closed','returned');
+   }
+   
+   function sendEmail()
+   {
+        Mailer::sendNotice($this);
+   }
+}
+
+
+
+Will take the value of $myModel->name and generate $myModel->slug.
+
+class MyModel extends ActiveRecord
+{
+    var $acts_as = array('sluggable'=>array('slug_source'=>'getSlugName','slug_target'=>'slug'));
+    
+    function getSlugName()
+    {
+        return $this->name.' '.$this->number;
+    }
+}
+
+$order = new Order();
+$order->close(); // notice is sent by mailer
+$order->returnOrder();
+
+Installation
+--------------------------------
+
+    ./script/plugin install acts_as_statemachine
+
+
+Credits
+-------
+
+Inspired by: http://elitists.textdriven.com/svn/plugins/acts_as_state_machine/trunk
+
+Future
+--------
+
+See TODO file to know what will be implemented into future versions of this plugin.
+
