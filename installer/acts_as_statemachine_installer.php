@@ -1,7 +1,7 @@
 <?php
 define('AK_AASTM_PLUGIN_FILES_DIR', AK_APP_PLUGINS_DIR.DS.'acts_as_statemachine'.DS.'installer'.DS.'files');
 
-class ActsAsStatemachineInstaller extends AkInstaller
+class ActsAsStatemachineInstaller extends AkPluginInstaller
 {
 
     var $_newModelMethods = array('transition'=>'
@@ -32,7 +32,7 @@ class ActsAsStatemachineInstaller extends AkInstaller
     {
         foreach ($this->_newModelMethods as $name=>$method) {
             echo "Adding method ActiveRecord::$name method: ";
-            $res = $this->addMethodToSharedModel($name,$method);
+            $res = $this->addMethodToBaseAR($name,$method);
             echo $res===true?'[OK]':'[FAIL]:'."\n-- ".$res;
             echo "\n";
         }
@@ -40,50 +40,10 @@ class ActsAsStatemachineInstaller extends AkInstaller
     function removeNewMethodsFromSharedModel()
     {
         foreach ($this->_newModelMethods as $name=>$method) {
-            $this->removeMethodFromSharedModel($name);
+            $this->removeMethodFromBaseAR($name);
         }
     }
-    function _addMethodToClass($class,$path,$name,$methodString)
-    {
-        $contents = Ak::file_get_contents($path);
-        if (!preg_match('/function\s+'.$name.'/i',$contents) && !preg_match("|/\*\* AUTOMATED START: $name \*/|", $contents)) {
-        
-        return (Ak::file_put_contents($path, preg_replace('|class '.$class.'(.*?)\n.*?{|i',"class $class\\1
-{
-    /** AUTOMATED START: $name */
-$methodString
-    /** AUTOMATED END: $name */
-",$contents))>0?true:'Could not write to '.$path);
-        } else {
-            return "Method $name already exists on $class in file $path.\n";
-        }
-    }
-    function addMethodToSharedModel($name,$methodString)
-    {
-        $path = AK_APP_DIR.DS.'shared_model.php';
-        return $this->_addMethodToClass('ActiveRecord',$path,$name,$methodString);
-    }
     
-    function addMethodToAppController($name,$methodString)
-    {
-        $path = AK_APP_DIR.DS.'application_controller.php';
-        return $this->_addMethodToClass('ApplicationController',$path,$name,$methodString);
-    }
-    
-    function _removeMethodFromClass($name,$path)
-    {
-        return Ak::file_put_contents($path, preg_replace("|(\n[^\n]*?/\*\* AUTOMATED START: $name \*/.*?/\*\* AUTOMATED END: $name \*/\n)|s","",Ak::file_get_contents($path)));
-    }
-    function removeMethodFromSharedModel($name)
-    {
-        $path = AK_APP_DIR.DS.'shared_model.php';
-        return $this->_removeMethodFromClass($name,$path);
-    }
-    function removeMethodFromAppController($name)
-    {
-        $path = AK_APP_DIR.DS.'application_controller.php';
-        return $this->_removeMethodFromClass($name,$path);
-    }
     function copyFiles()
     {
         $this->_copyFiles($this->files);
