@@ -1,5 +1,4 @@
 <?php
-define('AK_AASTM_PLUGIN_FILES_DIR', AK_APP_PLUGINS_DIR.DS.'acts_as_statemachine'.DS.'installer'.DS.'files');
 
 class ActsAsStatemachineInstaller extends AkPluginInstaller
 {
