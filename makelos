@@ -20,7 +20,7 @@ class Makelos
 
     function test($options = array())
     {
-        system('/usr/bin/env php '.dirname(__FILE__).'/test/acts_as_taggable.php');
+        system('/usr/bin/env php '.dirname(__FILE__).'/test/acts_as_statemachine.php');
     }
 
     function install()
@@ -37,8 +37,8 @@ class Makelos
 
     function &_getInstaller()
     {
-        require_once(dirname(__FILE__).DS.'installer'.DS.'acts_as_taggable_installer.php');
-        $Installer =& new AdminInstaller();
+        require_once(dirname(__FILE__).DS.'installer'.DS.'acts_as_statemachine_installer.php');
+        $Installer =& new ActsAsStatemachineInstaller();
         return $Installer;
     }
 
